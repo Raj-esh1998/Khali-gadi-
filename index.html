@@ -3,28 +3,40 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Khali Gadi</title>
 <style>
-body{font-family:Arial;margin:0;background:#f2f5f9}
-header{background:#075b39;color:white;text-align:center;padding:25px}
-main{max-width:600px;margin:20px auto;padding:15px}
-.card{background:white;padding:20px;border-radius:12px;margin-bottom:15px}
-input,select,button{width:100%;padding:13px;margin:8px 0;box-sizing:border-box;border:1px solid #ccc;border-radius:7px;font-size:16px}
-button{background:#087b49;color:white;border:0;font-weight:bold}
+body{margin:0;font-family:Arial;background:#f1f5f9;color:#222}
+header{background:#075b39;color:white;text-align:center;padding:22px}
+header h1{margin:0}
+nav{display:flex;flex-wrap:wrap;justify-content:center;background:#06452d}
+nav button{width:auto;margin:6px;padding:10px;background:white;color:#075b39}
+main{max-width:650px;margin:20px auto;padding:12px}
+.card{background:white;padding:18px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 8px #ddd}
+input,select{width:100%;padding:12px;margin:7px 0;box-sizing:border-box;border:1px solid #bbb;border-radius:6px}
+button{padding:12px;background:#087b49;color:white;border:0;border-radius:6px;cursor:pointer}
 h2{color:#075b39}
+.hidden{display:none}
 </style>
 </head>
 <body>
 <header>
 <h1>🚗 Khali Gadi</h1>
 <p>खाली सीट खोजें और यात्रा बुक करें</p>
+<p>Find Empty Seats & Book Your Ride</p>
 </header>
+<nav>
+<button onclick="show('home')">Home</button>
+<button onclick="show('owner')">मालिक रजिस्ट्रेशन</button>
+<button onclick="show('passenger')">यात्री रजिस्ट्रेशन</button>
+<button onclick="show('booking')">सीट बुकिंग</button>
+<button onclick="show('admin')">Admin</button>
+</nav>
 <main>
-<div class="card">
+<section id="home" class="card">
 <h2>यात्रा खोजें | Find a Ride</h2>
-<input id="from" placeholder="कहाँ से जाना है?">
-<input id="to" placeholder="कहाँ जाना है?">
+<input id="from" placeholder="कहाँ से | From">
+<input id="to" placeholder="कहाँ तक | To">
 <input id="date" type="date">
 <select id="seats">
 <option value="1">1 सीट</option>
@@ -33,23 +45,96 @@ h2{color:#075b39}
 <option value="4">4 सीट</option>
 </select>
 <button onclick="searchRide()">गाड़ी खोजें</button>
-<p id="result"></p>
-</div>
-<div class="card">
-<h2>गाड़ी मालिक | Vehicle Owner</h2>
-<input placeholder="गाड़ी का नाम">
-<input placeholder="कहाँ से">
-<input placeholder="कहाँ तक">
-<input type="number" placeholder="प्रति सीट किराया ₹">
-<button onclick="alert('जल्द उपलब्ध होगा')">गाड़ी की जानकारी दें</button>
-</div>
+<div id="results"></div>
+</section>
+
+<section id="owner" class="card hidden">
+<h2>गाड़ी मालिक रजिस्ट्रेशन</h2>
+<input id="oname" placeholder="मालिक का नाम">
+<input id="ophone" placeholder="मोबाइल नंबर" type="tel">
+<input id="vehicle" placeholder="गाड़ी का नाम">
+<input id="number" placeholder="गाड़ी नंबर">
+<input id="route" placeholder="कहाँ से - कहाँ तक">
+<input id="available" type="number" placeholder="खाली सीटें">
+<input id="fare" type="number" placeholder="प्रति सीट किराया ₹">
+<button onclick="registerOwner()">रजिस्टर करें</button>
+</section>
+
+<section id="passenger" class="card hidden">
+<h2>यात्री रजिस्ट्रेशन</h2>
+<input id="pname" placeholder="यात्री का नाम">
+<input id="pphone" placeholder="मोबाइल नंबर" type="tel">
+<button onclick="registerPassenger()">रजिस्टर करें</button>
+</section>
+
+<section id="booking" class="card hidden">
+<h2>सीट बुकिंग</h2>
+<input id="bname" placeholder="यात्री का नाम">
+<input id="bphone" placeholder="मोबाइल नंबर">
+<input id="bfrom" placeholder="कहाँ से">
+<input id="bto" placeholder="कहाँ तक">
+<input id="bdate" type="date">
+<select id="bseats">
+<option value="1">1 सीट</option>
+<option value="2">2 सीट</option>
+<option value="3">3 सीट</option>
+<option value="4">4 सीट</option>
+</select>
+<button onclick="bookSeat()">बुकिंग करें</button>
+</section>
+
+<section id="admin" class="card hidden">
+<h2>Admin Panel</h2>
+<p>यह शुरुआती डेमो पैनल है।</p>
+<input id="adminpin" type="password" placeholder="Admin PIN">
+<button onclick="adminLogin()">लॉगिन</button>
+<div id="adminData"></div>
+</section>
 </main>
+<footer style="text-align:center;padding:20px">
+Khali Gadi © 2026 | Uttar Pradesh
+</footer>
 <script>
+let owners=JSON.parse(localStorage.getItem('owners')||'[]');
+let passengers=JSON.parse(localStorage.getItem('passengers')||'[]');
+let bookings=JSON.parse(localStorage.getItem('bookings')||'[]');
+
+function show(id){
+document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+}
+function save(){
+localStorage.setItem('owners',JSON.stringify(owners));
+localStorage.setItem('passengers',JSON.stringify(passengers));
+localStorage.setItem('bookings',JSON.stringify(bookings));
+}
+function registerOwner(){
+if(!oname.value||!ophone.value||!vehicle.value||!number.value){
+alert('सभी जरूरी जानकारी भरें');return;
+}
+owners.push({name:oname.value,phone:ophone.value,vehicle:vehicle.value,number:number.value,route:route.value,seats:Number(available.value),fare:Number(fare.value)});
+save();alert('मालिक की जानकारी दर्ज हो गई');
+}
+function registerPassenger(){
+if(!pname.value||!pphone.value){alert('नाम और मोबाइल भरें');return;}
+passengers.push({name:pname.value,phone:pphone.value});
+save();alert('यात्री रजिस्ट्रेशन हो गया');
+}
 function searchRide(){
-let a=document.getElementById('from').value;
-let b=document.getElementById('to').value;
-if(!a||!b){alert('दोनों जगह भरें');return;}
-document.getElementById('result').innerText='यात्रा: '+a+' से '+b;
+let a=from.value.trim().toLowerCase(),b=to.value.trim().toLowerCase();
+let found=owners.filter(o=>o.route.toLowerCase().includes(a)&&o.route.toLowerCase().includes(b)&&o.seats>=Number(seats.value));
+results.innerHTML=found.length?found.map(o=>'<div class="card"><b>'+o.vehicle+'</b><p>'+o.route+'</p><p>खाली सीटें: '+o.seats+'</p><p>किराया: ₹'+o.fare+'</p></div>').join(''):'अभी कोई मिलती-जुलती गाड़ी नहीं मिली।';
+}
+function bookSeat(){
+if(!bname.value||!bphone.value||!bfrom.value||!bto.value){
+alert('सभी जानकारी भरें');return;
+}
+bookings.push({name:bname.value,phone:bphone.value,from:bfrom.value,to:bto.value,date:bdate.value,seats:bseats.value});
+save();alert('बुकिंग का अनुरोध दर्ज हो गया');
+}
+function adminLogin(){
+if(adminpin.value!=='2468'){alert('गलत PIN');return;}
+adminData.innerHTML='<h3>मालिक: '+owners.length+'</h3><h3>यात्री: '+passengers.length+'</h3><h3>बुकिंग: '+bookings.length+'</h3>'+bookings.map(b=>'<p>'+b.name+' - '+b.from+' से '+b.to+' - '+b.seats+' सीट</p>').join('');
 }
 </script>
 </body>
