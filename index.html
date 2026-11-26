@@ -1,1 +1,56 @@
-index.html
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khali Gadi</title>
+<style>
+body{font-family:Arial;margin:0;background:#f2f5f9}
+header{background:#075b39;color:white;text-align:center;padding:25px}
+main{max-width:600px;margin:20px auto;padding:15px}
+.card{background:white;padding:20px;border-radius:12px;margin-bottom:15px}
+input,select,button{width:100%;padding:13px;margin:8px 0;box-sizing:border-box;border:1px solid #ccc;border-radius:7px;font-size:16px}
+button{background:#087b49;color:white;border:0;font-weight:bold}
+h2{color:#075b39}
+</style>
+</head>
+<body>
+<header>
+<h1>🚗 Khali Gadi</h1>
+<p>खाली सीट खोजें और यात्रा बुक करें</p>
+</header>
+<main>
+<div class="card">
+<h2>यात्रा खोजें | Find a Ride</h2>
+<input id="from" placeholder="कहाँ से जाना है?">
+<input id="to" placeholder="कहाँ जाना है?">
+<input id="date" type="date">
+<select id="seats">
+<option value="1">1 सीट</option>
+<option value="2">2 सीट</option>
+<option value="3">3 सीट</option>
+<option value="4">4 सीट</option>
+</select>
+<button onclick="searchRide()">गाड़ी खोजें</button>
+<p id="result"></p>
+</div>
+<div class="card">
+<h2>गाड़ी मालिक | Vehicle Owner</h2>
+<input placeholder="गाड़ी का नाम">
+<input placeholder="कहाँ से">
+<input placeholder="कहाँ तक">
+<input type="number" placeholder="प्रति सीट किराया ₹">
+<button onclick="alert('जल्द उपलब्ध होगा')">गाड़ी की जानकारी दें</button>
+</div>
+</main>
+<script>
+function searchRide(){
+let a=document.getElementById('from').value;
+let b=document.getElementById('to').value;
+if(!a||!b){alert('दोनों जगह भरें');return;}
+document.getElementById('result').innerText='यात्रा: '+a+' से '+b;
+}
+</script>
+</body>
+</html>
